@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Gemini-সহ থ্রেট ইন্টেলিজেন্স ড্যাশবোর্ড</title>
+    <!-- Chosen Palette: Cyber Dark (Deep navy background, with neon cyan, green, and red for accents and data visualization) -->
+    <!-- Application Structure Plan: The dashboard now includes predictive analysis and automated anomaly detection. The layout is updated to a three-column bottom row to accommodate a new "AI Smart Alerts" panel. This creates a proactive command center that not only shows current data but also intelligently flags unusual patterns and forecasts potential future threats on demand, offering a comprehensive security overview. -->
+    <!-- Visualization & Content Choices:
+        - ✨ AI Smart Alerts -> Goal: Proactively Inform -> Presentation: Dynamic Text Card -> Interaction: Text updates automatically based on periodic Gemini analysis of logs -> Justification: Moves beyond reactive monitoring to intelligent, automated pattern detection.
+        - ✨ Predictive Analysis -> Goal: Forecast & Guide -> Presentation: Modal with generated text -> Interaction: Button triggers Gemini to predict future threats based on current trends -> Justification: Provides strategic, forward-looking insights for proactive defense planning.
+        - Other elements (Map, Charts, Logs) retain their roles but now feed data into the new AI features, creating a more integrated and intelligent system.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: #0a0f1e; color: #e0e7ff; }
+        .dashboard-card { background-color: rgba(18, 24, 40, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(56, 189, 248, 0.2); transition: all 0.3s ease; }
+        .dashboard-card:hover { border-color: rgba(56, 189, 248, 0.5); transform: translateY(-5px); }
+        .chart-container { position: relative; width: 100%; height: 250px; }
+        #threat-map-container { 
+            position: relative; 
+            width: 100%; 
+            padding-top: 50%; /* 2:1 Aspect Ratio for the map area */
+            border-radius: 0.75rem; 
+            overflow: hidden;
+            background-color: #0c1222;
+            /* New CSS Grid background - no external image needed */
+            background-image: 
+                linear-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px), 
+                linear-gradient(90deg, rgba(56, 189, 248, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+        #threat-map-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .log-entry, .smart-alert { animation: slideIn 0.5s ease-out forwards; }
+        .modal-overlay { animation: fadeIn 0.3s ease-out forwards; }
+        .modal-content { animation: scaleUp 0.3s ease-out forwards; }
+        .loader { width: 32px; height: 32px; border: 4px solid #38bdf8; border-bottom-color: transparent; border-radius: 50%; display: inline-block; box-sizing: border-box; animation: rotation 1s linear infinite; }
+        #threat-level-circle { transition: all 0.5s ease; }
+        .level-1 { border-color: #22c55e; box-shadow: 0 0 15px #22c55e; color: #22c55e; }
+        .level-2 { border-color: #38bdf8; box-shadow: 0 0 15px #38bdf8; color: #38bdf8; }
+        .level-3 { border-color: #f59e0b; box-shadow: 0 0 15px #f59e0b; color: #f59e0b; }
+        .level-4 { border-color: #ef4444; box-shadow: 0 0 15px #ef4444; color: #ef4444; }
+        .level-5 { border-color: #be123c; box-shadow: 0 0 25px #be123c; color: #be123c; animation: pulse 1.5s infinite; }
+        .gemini-btn { background-color: #1e3a8a; color: #93c5fd; }
+        .gemini-btn:hover { background-color: #1d4ed8; color: #dbeafe; }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleUp { from { opacity: 0; transform: scale(0.95) } to { opacity: 1; transform: scale(1) } }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 25px #be123c; } 50% { box-shadow: 0 0 40px #ef4444; } }
+    </style>
+</head>
+<body class="antialiased p-4 lg:p-6">
+    <div class="max-w-screen-2xl mx-auto">
+        <header class="mb-6 flex justify-between items-center">
+            <h1 class="text-2xl md:text-3xl font-bold">থ্রেট ইন্টেলিজেন্স ড্যাশবোর্ড</h1>
+            <div class="text-lg font-medium text-sky-300" id="current-time"></div>
+        </header>
+
+        <main class="grid grid-cols-12 gap-6">
+            <div class="col-span-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="dashboard-card rounded-xl p-4 flex items-center gap-4"><i class="fas fa-shield-halved text-4xl text-sky-400"></i><div><p class="text-sm text-gray-400">মোট অ্যাটাক (আজ)</p><p id="total-attacks" class="text-2xl font-bold">0</p></div></div>
+                <div class="dashboard-card rounded-xl p-4 flex items-center gap-4"><i class="fas fa-biohazard text-4xl text-red-500"></i><div><p class="text-sm text-gray-400">গুরুতর ঝুঁকি</p><p id="critical-threats" class="text-2xl font-bold">0</p></div></div>
+                <div class="dashboard-card rounded-xl p-4 flex items-center gap-4"><i class="fas fa-crosshairs text-4xl text-amber-400"></i><div><p class="text-sm text-gray-400">প্রধান টার্গেট দেশ</p><p id="top-target" class="text-2xl font-bold">-</p></div></div>
+                <div class="dashboard-card rounded-xl p-4 flex items-center gap-4"><i class="fas fa-globe-asia text-4xl text-emerald-400"></i><div><p class="text-sm text-gray-400">সক্রিয় উৎস</p><p id="active-sources" class="text-2xl font-bold">0</p></div></div>
+            </div>
+
+            <div class="col-span-12 lg:col-span-8 dashboard-card rounded-xl p-4"><h2 class="text-xl font-semibold mb-4">লাইভ থ্রেট ম্যাপ</h2><div id="threat-map-container"><canvas id="threat-map-canvas"></canvas></div></div>
+
+            <div class="col-span-12 lg:col-span-4 grid grid-rows-2 gap-6">
+                <div class="row-span-1 dashboard-card rounded-xl p-4 flex flex-col items-center justify-center">
+                    <h2 class="text-xl font-semibold mb-3">গ্লোবাল থ্রেট লেভেল</h2>
+                    <div id="threat-level-circle" class="w-32 h-32 rounded-full border-8 flex items-center justify-center text-4xl font-bold level-1"><span id="threat-level-number">1</span></div>
+                    <p id="threat-level-text" class="mt-3 font-semibold text-lg text-green-400 transition-colors duration-500">স্বাভাবিক</p>
+                    <div class="flex gap-2 mt-4">
+                        <button id="briefing-btn" class="text-xs font-semibold bg-sky-600/50 hover:bg-sky-500/80 text-sky-200 px-3 py-2 rounded-full transition-all flex items-center gap-2"><i class="fas fa-brain"></i> দৈনিক ব্রিফিং</button>
+                        <button id="forecast-btn" class="text-xs font-semibold gemini-btn px-3 py-2 rounded-full transition-all flex items-center gap-2"><i class="fas fa-chart-line"></i> ভবিষ্যৎ বিশ্লেষণ</button>
+                    </div>
+                </div>
+                <div class="row-span-1 dashboard-card rounded-xl p-4 flex flex-col">
+                    <h2 class="text-xl font-semibold mb-4">রিয়েল-টাইম লগ ফিড</h2>
+                    <div id="log-feed" class="flex-grow space-y-3 overflow-y-auto h-40 lg:h-full pr-2"></div>
+                </div>
+            </div>
+
+            <div class="col-span-12 lg:col-span-4 dashboard-card rounded-xl p-4"><h2 class="text-xl font-semibold mb-4">অ্যাটাকের ধরন</h2><div class="chart-container mx-auto max-w-xs"><canvas id="attack-type-chart"></canvas></div></div>
+            <div class="col-span-12 lg:col-span-4 dashboard-card rounded-xl p-4"><h2 class="text-xl font-semibold mb-4">শীর্ষ আক্রমণকারী দেশ</h2><div class="chart-container"><canvas id="top-countries-chart"></canvas></div></div>
+            
+            <div class="col-span-12 lg:col-span-4 dashboard-card rounded-xl p-4 flex flex-col">
+                <h2 class="text-xl font-semibold mb-4">AI Smart Alerts</h2>
+                <div id="smart-alert-content" class="flex-grow space-y-3 overflow-y-auto h-full pr-2">
+                    <p class="text-gray-400 text-center mt-8">হুমকির প্যাটার্ন বিশ্লেষণ করা হচ্ছে...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="analysis-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div id="modal-overlay" class="absolute inset-0 bg-black/60 modal-overlay"></div>
+        <div class="dashboard-card modal-content rounded-xl p-6 w-full max-w-2xl relative">
+            <button id="modal-close-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"><i class="fas fa-times text-2xl"></i></button>
+            <div id="modal-title" class="text-2xl font-bold mb-4"></div>
+            <div class="text-gray-300 mb-4" id="modal-attack-details"></div>
+            <div class="border-t border-sky-900 pt-4"><h3 class="text-lg font-semibold text-sky-300 mb-2">✨ Gemini AI বিশ্লেষণ</h3><div id="gemini-response-content" class="text-gray-300 space-y-4 max-h-[50vh] overflow-y-auto pr-2"><div id="gemini-loader" class="flex justify-center items-center py-8"><div class="loader"></div></div></div></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const countries = [{ name: "China", x: 0.74, y: 0.36 }, { name: "USA", x: 0.25, y: 0.34 }, { name: "Russia", x: 0.60, y: 0.22 }, { name: "Brazil", x: 0.38, y: 0.68 }, { name: "India", x: 0.65, y: 0.45 }, { name: "Germany", x: 0.50, y: 0.27 }, { name: "UK", x: 0.47, y: 0.26 }, { name: "Nigeria", x: 0.49, y: 0.52 }, { name: "Iran", x: 0.58, y: 0.38 }, { name: "North Korea", x: 0.77, y: 0.34 }];
+            const attackTypes = ["DDoS", "Malware", "Phishing", "SQL Injection", "Ransomware"];
+            const riskColors = {"DDoS": "text-sky-400", "Malware": "text-red-500", "Phishing": "text-amber-400", "SQL Injection": "text-red-500", "Ransomware": "text-red-500" };
+            const levelConfig = { 1: { text: "স্বাভাবিক", color: "text-green-400", class: "level-1" }, 2: { text: "নিম্ন ঝুঁকি", color: "text-sky-400", class: "level-2" }, 3: { text: "মাঝারি", color: "text-amber-400", class: "level-3" }, 4: { text: "উচ্চ ঝুঁকি", color: "text-red-400", class: "level-4" }, 5: { text: "অত্যন্ত উচ্চ", color: "text-red-600", class: "level-5" } };
+            const totalAttacksEl = document.getElementById('total-attacks'), criticalThreatsEl = document.getElementById('critical-threats'), topTargetEl = document.getElementById('top-target'), activeSourcesEl = document.getElementById('active-sources'), logFeedEl = document.getElementById('log-feed'), timeEl = document.getElementById('current-time'), mapCanvas = document.getElementById('threat-map-canvas'), mapCtx = mapCanvas.getContext('2d'), analysisModal = document.getElementById('analysis-modal'), modalTitle = document.getElementById('modal-title'), modalAttackDetails = document.getElementById('modal-attack-details'), geminiResponseContent = document.getElementById('gemini-response-content'), geminiLoader = document.getElementById('gemini-loader'), threatLevelCircle = document.getElementById('threat-level-circle'), threatLevelNumber = document.getElementById('threat-level-number'), threatLevelText = document.getElementById('threat-level-text'), briefingBtn = document.getElementById('briefing-btn'), forecastBtn = document.getElementById('forecast-btn'), smartAlertContentEl = document.getElementById('smart-alert-content');
+            let attacksOnMap = [], totalAttacks = 0, criticalThreats = 0, globalThreatLevel = 1, recentLogs = [];
+            let attackTypeChart, topCountriesChart, isAnalyzingAnomaly = false;
+            let attackTypeData = [1, 1, 1, 1, 1]; let topCountriesData = {}; countries.forEach(c => topCountriesData[c.name] = 0);
+
+            function resizeCanvas() { const c = document.getElementById('threat-map-container'); if (!c) return; mapCanvas.width = c.clientWidth; mapCanvas.height = c.clientHeight; }
+            window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+            function initCharts() {
+                const atc = document.getElementById('attack-type-chart').getContext('2d');
+                attackTypeChart = new Chart(atc, { type: 'doughnut', data: { labels: attackTypes, datasets: [{ data: attackTypeData, backgroundColor: ['#38bdf8', '#ef4444', '#f59e0b', '#dc2626', '#be123c'], borderColor: '#121828', borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#e0e7ff', boxWidth: 12, padding: 15 } } } } });
+                const tcc = document.getElementById('top-countries-chart').getContext('2d');
+                topCountriesChart = new Chart(tcc, { type: 'bar', data: { labels: [], datasets: [{ label: 'অ্যাটাকের সংখ্যা', data: [], backgroundColor: 'rgba(56, 189, 248, 0.6)', borderColor: 'rgba(56, 189, 248, 1)', borderWidth: 1, borderRadius: 4 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.1)' } }, y: { ticks: { color: '#e0e7ff' }, grid: { display: false } } }, plugins: { legend: { display: false } } } });
+            }
+            function drawMap() {
+                mapCtx.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+                attacksOnMap.forEach((a, i) => { a.progress += a.speed; if (a.progress >= 1) { attacksOnMap.splice(i, 1); return; } const cx = a.from.x + (a.to.x - a.from.x) * a.progress, cy = a.from.y + (a.to.y - a.from.y) * a.progress; mapCtx.beginPath(); mapCtx.moveTo(a.from.x, a.from.y); mapCtx.quadraticCurveTo(a.control.x, a.control.y, cx, cy); mapCtx.strokeStyle = `rgba(239, 68, 68, ${1 - a.progress})`; mapCtx.lineWidth = 2; mapCtx.stroke(); mapCtx.beginPath(); mapCtx.arc(cx, cy, 3, 0, Math.PI * 2); mapCtx.fillStyle = 'rgba(239, 68, 68, 1)'; mapCtx.fill(); });
+                requestAnimationFrame(drawMap);
+            }
+            function calculateThreatLevel() {
+                let score = totalAttacks + (criticalThreats * 3);
+                if (score > 150) globalThreatLevel = 5; else if (score > 100) globalThreatLevel = 4; else if (score > 50) globalThreatLevel = 3; else if (score > 10) globalThreatLevel = 2; else globalThreatLevel = 1;
+                threatLevelNumber.textContent = globalThreatLevel; const config = levelConfig[globalThreatLevel]; threatLevelText.textContent = config.text;
+                threatLevelText.className = `mt-3 font-semibold text-lg transition-colors duration-500 ${config.color}`;
+                threatLevelCircle.className = `w-32 h-32 rounded-full border-8 flex items-center justify-center text-4xl font-bold ${config.class}`;
+            }
+
+            function updateDashboard() {
+                timeEl.textContent = new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const from = countries[Math.floor(Math.random() * countries.length)]; let to = countries[Math.floor(Math.random() * countries.length)];
+                while (from.name === to.name) { to = countries[Math.floor(Math.random() * countries.length)]; }
+                const type = attackTypes[Math.floor(Math.random() * attackTypes.length)];
+                totalAttacks++; criticalThreats += ["Malware", "Ransomware", "SQL Injection"].includes(type) ? 1 : 0;
+                totalAttacksEl.textContent = totalAttacks.toLocaleString('bn-BD'); criticalThreatsEl.textContent = criticalThreats.toLocaleString('bn-BD'); topTargetEl.textContent = to.name; activeSourcesEl.textContent = Object.values(topCountriesData).filter(v => v > 0).length;
+                attacksOnMap.push({ from: { x: from.x * mapCanvas.width, y: from.y * mapCanvas.height }, to: { x: to.x * mapCanvas.width, y: to.y * mapCanvas.height }, control: { x: (from.x + to.x) / 2 * mapCanvas.width, y: (from.y + to.y) / 2 * mapCanvas.height - 50 }, progress: 0, speed: 0.01 + Math.random() * 0.01 });
+                const log = document.createElement('div'); log.className = 'log-entry bg-gray-900/50 p-3 rounded-lg text-sm';
+                log.innerHTML = `<div class="flex justify-between items-center"><p class="font-mono text-xs text-gray-400">${new Date().toLocaleTimeString('bn-BD')}</p><p class="font-bold ${riskColors[type]}">${type}</p></div><p class="truncate text-gray-300 mt-1">উৎস: ${from.name} \u2192 গন্তব্য: ${to.name}</p><button class="analyze-btn text-xs font-semibold bg-sky-600/50 hover:bg-sky-500/80 text-sky-200 px-3 py-1 rounded-full mt-2 transition-all" data-attack-type="${type}" data-source="${from.name}" data-target="${to.name}">✨ বিশ্লেষণ</button>`;
+                logFeedEl.prepend(log); if (logFeedEl.children.length > 20) { logFeedEl.lastChild.remove(); }
+                recentLogs.unshift({ from: from.name, to: to.name, type }); if(recentLogs.length > 20) recentLogs.pop();
+                attackTypeData[attackTypes.indexOf(type)]++; attackTypeChart.update();
+                topCountriesData[from.name]++; const sorted = Object.entries(topCountriesData).sort(([,a],[,b]) => b-a).slice(0, 7);
+                topCountriesChart.data.labels = sorted.map(c => c[0]); topCountriesChart.data.datasets[0].data = sorted.map(c => c[1]); topCountriesChart.update();
+                calculateThreatLevel();
+            }
+            async function callGeminiAPI(prompt, modalInfo = {}) {
+                if (modalInfo.title) modalTitle.textContent = modalInfo.title;
+                if (modalInfo.details) modalAttackDetails.innerHTML = modalInfo.details;
+                geminiLoader.classList.remove('hidden'); geminiResponseContent.innerHTML = ''; analysisModal.classList.remove('hidden');
+                try {
+                    const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                    const apiKey = ""; const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                    const result = await response.json();
+                    if (result.candidates && result.candidates[0]) {
+                        let text = result.candidates[0].content.parts[0].text;
+                        text = text.replace(/### (.*?)\n/g, '<h4 class="text-md font-bold text-sky-300 mt-4 mb-2">$1</h4>');
+                        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        text = text.replace(/^\* (.*?)$/gm, '<li class="flex gap-2 items-start mb-1"><i class="fas fa-check-circle text-emerald-400 mt-1"></i><span>$1</span></li>');
+                        geminiResponseContent.innerHTML = `<ul>${text}</ul>`;
+                    } else { throw new Error("No content received."); }
+                } catch (error) { console.error("Gemini API call failed:", error); geminiResponseContent.innerHTML = '<p>বিশ্লেষণ আনতে একটি ত্রুটি ঘটেছে। অনুগ্রহ করে আবার চেষ্টা করুন।</p>'; } finally { geminiLoader.classList.add('hidden'); }
+            }
+            async function checkForAnomalies() {
+                if (isAnalyzingAnomaly || recentLogs.length < 15) return;
+                isAnalyzingAnomaly = true;
+                const logsString = recentLogs.map(l => `From ${l.from} to ${l.to}, type ${l.type}`).join('; ');
+                const prompt = `You are an anomaly detection system. Analyze these recent cyber threat logs: "${logsString}". Identify a single, most significant unusual pattern (e.g., sudden surge from one country, coordinated attack types, new frequent target). If a clear anomaly exists, describe it in a single, concise sentence in Bangla starting with "অস্বাভাবিক প্যাটার্ন:". Otherwise, respond with exactly "NO_ANOMALY".`;
+                try {
+                    const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                    const apiKey = ""; const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    const result = await response.json();
+                    const text = result.candidates[0].content.parts[0].text;
+                    if (text !== "NO_ANOMALY") {
+                        if (smartAlertContentEl.childElementCount > 3) smartAlertContentEl.lastChild.remove();
+                        const alertEl = document.createElement('div');
+                        alertEl.className = 'smart-alert bg-amber-900/50 border-l-4 border-amber-400 p-3 rounded-r-lg';
+                        alertEl.innerHTML = `<p class="flex items-center gap-2"><i class="fas fa-exclamation-triangle text-amber-400"></i><span class="font-semibold">${text.replace("অস্বাভাবিক প্যাটার্ন:", "")}</span></p>`;
+                        if (smartAlertContentEl.querySelector('p')) {
+                            smartAlertContentEl.innerHTML = '';
+                        }
+                        smartAlertContentEl.prepend(alertEl);
+                    }
+                } catch (e) { console.error("Anomaly check failed:", e); } finally { isAnalyzingAnomaly = false; }
+            }
+
+            function handleAnalysis(e) {
+                if (!e.target.classList.contains('analyze-btn')) return;
+                const { attackType, source, target } = e.target.dataset;
+                const prompt = `A cyber threat is detected. Type: '${attackType}', Source: '${source}', Target: '${target}'. In Bangla, provide two sections. First, a simple 'Explanation' of this threat type for a non-technical person. Second, a list of 'Immediate Mitigation Steps' as a markdown checklist for a security team.`;
+                callGeminiAPI(prompt, { title: `${attackType} অ্যাটাক বিশ্লেষণ`, details: `<p><strong>উৎস:</strong> ${source}</p><p><strong>গন্তব্য:</strong> ${target}</p>` });
+            }
+            function handleBriefing() {
+                const topCountry = topCountriesChart.data.labels[0] || 'N/A';
+                const topAttack = attackTypes[attackTypeData.indexOf(Math.max(...attackTypeData))] || 'N/A';
+                const prompt = `Act as a CISO. Based on the following data, provide a concise executive security briefing in Bangla: Total attacks today: ${totalAttacks}. Critical threats: ${criticalThreats}. Top attack source: ${topCountry}. Most frequent attack type: ${topAttack}. Current global threat level: ${globalThreatLevel} (${levelConfig[globalThreatLevel].text}). Summarize the situation and suggest one key strategic focus area.`;
+                callGeminiAPI(prompt, { title: 'দৈনিক নিরাপত্তা ব্রিফিং', details: `<p><strong>বর্তমান থ্রেট লেভেল:</strong> ${globalThreatLevel} (${levelConfig[globalThreatLevel].text})</p>` });
+            }
+             function handleForecast() {
+                const topCountry = topCountriesChart.data.labels[0] || 'N/A';
+                const topAttack = attackTypes[attackTypeData.indexOf(Math.max(...attackTypeData))] || 'N/A';
+                const prompt = `You are a cybersecurity trend forecaster. Based on the current high volume of attacks from '${topCountry}' and the prevalence of '${topAttack}' attacks, what is a likely major cyber threat vector or campaign we should prepare for in the next 24-48 hours? Explain your reasoning in a short, clear paragraph in Bangla.`;
+                callGeminiAPI(prompt, { title: 'ভবিষ্যৎ হুমকি বিশ্লেষণ', details: `<p>বর্তমান তথ্যের উপর ভিত্তি করে পূর্বাভাস দেওয়া হচ্ছে।</p>` });
+            }
+
+            logFeedEl.addEventListener('click', handleAnalysis);
+            briefingBtn.addEventListener('click', handleBriefing);
+            forecastBtn.addEventListener('click', handleForecast);
+            document.getElementById('modal-overlay').addEventListener('click', () => analysisModal.classList.add('hidden'));
+            document.getElementById('modal-close-btn').addEventListener('click', () => analysisModal.classList.add('hidden'));
+
+            initCharts(); drawMap(); setInterval(updateDashboard, 2500); setInterval(checkForAnomalies, 20000); updateDashboard();
+        });
+    </script>
+</body>
+</html>

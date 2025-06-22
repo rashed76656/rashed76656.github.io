@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SR Security Interactive Security Dashboard with Gemini API - ShopNest</title>
+    <!-- Chosen Palette: Calm Harmony (Light neutral background, subtle blue accents, and risk-based colors for charts) -->
+    <!-- Application Structure Plan: A single-page dashboard layout. Instead of a linear report, content is segmented into interactive tabs (Overview, Findings, Methodology, Outcome). The 'Findings' section is the centerpiece, featuring a dynamic chart and clickable vulnerability cards. When a user clicks on a vulnerability, a dedicated details pane updates with its description, impact, and solution. This now includes Gemini API buttons to generate simplified explanations and prevention checklists, making the report actionable for both technical and non-technical audiences. This non-linear, task-oriented structure allows users to explore the most critical information first and delve into details as needed, which is more engaging and user-friendly than a static document. -->
+    <!-- Visualization & Content Choices: 
+        - Project Overview -> Goal: Inform -> Presentation: Key Stat Cards (HTML/Tailwind) -> Interaction: None -> Justification: Quickly provides high-level context.
+        - Vulnerability Severity -> Goal: Compare -> Viz Method: Horizontal Bar Chart (Chart.js Canvas) -> Interaction: Click on a bar to view details -> Justification: Visually compares the risk levels of found issues, providing an immediate sense of priority.
+        - Vulnerability Details -> Goal: Organize & Inform -> Presentation: Dynamic Content Pane (JS update) -> Interaction: Clickable cards/buttons update the pane -> Justification: Organizes detailed information cleanly, preventing cognitive overload by showing one issue at a time.
+        - ✨ AI Content Generation -> Goal: Explain & Guide -> Presentation: Dynamic AI content box (JS update) -> Interaction: Buttons trigger Gemini API call -> Justification: Adds a layer of understanding for non-technical users and provides actionable checklists for developers.
+        - Methodology -> Goal: Explain Process -> Presentation: Numbered Step Diagram (HTML/Tailwind) -> Interaction: None -> Justification: A clear, easy-to-follow visual flow of the audit process.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .tab-active {
+            border-color: #0d6efd;
+            background-color: #e7f1ff;
+            color: #0d6efd;
+            font-weight: 600;
+        }
+        .vulnerability-card-active {
+            border-color: #0d6efd;
+            transform: scale(1.03);
+            box-shadow: 0 4px 20px rgba(13, 110, 253, 0.15);
+        }
+        .risk-critical { background-color: #dc3545; }
+        .risk-high { background-color: #fd7e14; }
+        .risk-medium { background-color: #ffc107; }
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .gemini-btn {
+            background-color: #e7f1ff;
+            color: #0d6efd;
+            transition: all 0.3s ease;
+        }
+        .gemini-btn:hover {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e7f1ff;
+            border-bottom-color: #0d6efd;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Case Study: "ShopNest" E-commerce Platform Security Assessment</h1>
+            <p class="text-lg text-gray-600 mt-2">An interactive penetration testing report conducted by SR Security</p>
+        </header>
+
+        <main class="bg-white p-6 rounded-2xl shadow-lg">
+            <nav class="flex flex-wrap justify-center border-b border-gray-200 mb-6">
+                <button data-tab="overview" class="tab-btn px-4 py-3 text-sm md:text-base border-b-2 tab-active">Overview</button>
+                <button data-tab="findings" class="tab-btn px-4 py-3 text-sm md:text-base border-b-2 border-transparent text-gray-500 hover:border-gray-300">Key Findings</button>
+                <button data-tab="methodology" class="tab-btn px-4 py-3 text-sm md:text-base border-b-2 border-transparent text-gray-500 hover:border-gray-300">Methodology</button>
+                <button data-tab="outcome" class="tab-btn px-4 py-3 text-sm md:text-base border-b-2 border-transparent text-gray-500 hover:border-gray-300">Outcome & Recommendations</button>
+            </nav>
+
+            <div id="content-area">
+                <!-- Overview Content -->
+                <div id="overview-content" class="tab-content">
+                    <p class="text-base text-gray-700 mb-6 leading-relaxed">
+                        এই ড্যাশবোর্ডটি "ShopNest Inc." এর নতুন ই-কমার্স প্ল্যাটফর্মের নিরাপত্তা নিরীক্ষার একটি সারসংক্ষেপ প্রদান করে। আমাদের মূল উদ্দেশ্য ছিল প্ল্যাটফর্মটি ব্যবহারকারীদের জন্য লাইভ করার পূর্বে এর নিরাপত্তা ঝুঁকিগুলো চিহ্নিত করা এবং সমাধানের পথ দেখানো, যাতে একটি নিরাপদ এবং নির্ভরযোগ্য অনলাইন কেনাকাটার পরিবেশ নিশ্চিত করা যায়।
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                        <div class="bg-blue-50 p-6 rounded-lg">
+                            <h3 class="text-lg font-bold text-blue-800">ক্লায়েন্ট</h3>
+                            <p class="text-2xl font-semibold text-blue-900 mt-2">ShopNest Inc.</p>
+                        </div>
+                        <div class="bg-green-50 p-6 rounded-lg">
+                            <h3 class="text-lg font-bold text-green-800">ভূমিকা</h3>
+                            <p class="text-2xl font-semibold text-green-900 mt-2">বাহ্যিক নিরাপত্তা নিরীক্ষক</p>
+                        </div>
+                        <div class="bg-yellow-50 p-6 rounded-lg">
+                            <h3 class="text-lg font-bold text-yellow-800">সময়কাল</h3>
+                            <p class="text-2xl font-semibold text-yellow-900 mt-2">২ সপ্তাহ</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Findings Content (Initially Hidden) -->
+                <div id="findings-content" class="tab-content hidden">
+                     <p class="text-base text-gray-700 mb-6 leading-relaxed text-center max-w-3xl mx-auto">
+                        আমাদের পরীক্ষার সময়, আমরা বিভিন্ন মাত্রার বেশ কিছু নিরাপত্তা দুর্বলতা শনাক্ত করেছি। নিচের চার্টে ঝুঁকি অনুযায়ী দুর্বলতাগুলোর একটি সারসংক্ষেপ দেওয়া হলো। নির্দিষ্ট দুর্বলতার কার্ড বা চার্টের বারে ক্লিক করে বিস্তারিত জানুন।
+                    </p>
+                    <div class="chart-container mb-8">
+                        <canvas id="findingsChart"></canvas>
+                    </div>
+                    <div class="grid md:grid-cols-12 gap-6">
+                        <div id="vulnerability-list" class="md:col-span-4 space-y-4"></div>
+                        <div id="vulnerability-details" class="md:col-span-8 bg-gray-50 p-6 rounded-lg border border-gray-200 min-h-[300px]"></div>
+                    </div>
+                </div>
+                
+                <!-- Methodology Content (Initially Hidden) -->
+                <div id="methodology-content" class="tab-content hidden">
+                    <p class="text-base text-gray-700 mb-8 leading-relaxed text-center max-w-3xl mx-auto">
+                        আমরা ইন্ডাস্ট্রি-স্ট্যান্ডার্ড পদ্ধতি অনুসরণ করে এই টেস্টিং সম্পন্ন করেছি। আমাদের কর্মপন্থাটি বিভিন্ন ধাপে বিভক্ত ছিল, যা একটি সম্পূর্ণ এবং গভীর নিরাপত্তা মূল্যায়ন নিশ্চিত করে।
+                    </p>
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-blue-500 text-white flex items-center justify-center rounded-full font-bold text-xl">১</div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800">তথ্য সংগ্রহ (Reconnaissance)</h3>
+                                <p class="text-gray-600 mt-1">প্ল্যাটফর্মের আর্কিটেকচার, ব্যবহৃত প্রযুক্তি এবং সম্ভাব্য আক্রমণের ক্ষেত্রগুলো সম্পর্কে প্রাথমিক তথ্য সংগ্রহ করা।</p>
+                            </div>
+                        </div>
+                         <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-blue-500 text-white flex items-center justify-center rounded-full font-bold text-xl">২</div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800">স্ক্যানিং ও এনুমারেশন (Scanning & Enumeration)</h3>
+                                <p class="text-gray-600 mt-1">আধুনিক টুল ব্যবহার করে সিস্টেমের সাধারণ দুর্বলতা ও খোলা পোর্টগুলো দ্রুত চিহ্নিত করা।</p>
+                            </div>
+                        </div>
+                         <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-blue-500 text-white flex items-center justify-center rounded-full font-bold text-xl">৩</div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800">ম্যানুয়াল পেনিট্রেশন টেস্টিং (Manual Testing)</h3>
+                                <p class="text-gray-600 mt-1">অভিজ্ঞ ইঞ্জিনিয়ার দ্বারা জটিল এবং লজিক্যাল দুর্বলতাগুলো খুঁজে বের করা, যা স্বয়ংক্রিয় স্ক্যানারে ধরা পড়ে না।</p>
+                            </div>
+                        </div>
+                         <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-blue-500 text-white flex items-center justify-center rounded-full font-bold text-xl">৪</div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800">বিশ্লেষণ ও রিপোর্টিং (Analysis & Reporting)</h3>
+                                <p class="text-gray-600 mt-1">প্রাপ্ত সকল দুর্বলতার ঝুঁকি, প্রভাব এবং সমাধানের উপায়সহ একটি বিস্তারিত ও কার্যকরী রিপোর্ট তৈরি করা।</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Outcome Content (Initially Hidden) -->
+                <div id="outcome-content" class="tab-content hidden">
+                    <div class="max-w-4xl mx-auto">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">সুপারিশ এবং চূড়ান্ত ফলাফল</h2>
+                        <p class="text-gray-700 mb-6 leading-relaxed">
+                            প্রতিটি শনাক্তকৃত দুর্বলতার জন্য আমরা ক্লায়েন্টের ডেভেলপার টিমকে নির্দিষ্ট এবং কার্যকরী প্রযুক্তিগত সমাধানের সুপারিশ করেছি। আমাদের পরামর্শ অনুযায়ী, SQL ইনজেকশনের জন্য প্যারামিটারাইজড কোয়েরি, XSS-এর জন্য আউটপুট এনকোডিং এবং IDOR-এর জন্য শক্তিশালী অ্যাক্সেস কন্ট্রোল ব্যবস্থা প্রয়োগ করা হয়েছে।
+                        </p>
+                         <div class="bg-green-50 border-l-4 border-green-500 text-green-800 p-6 rounded-r-lg">
+                            <h3 class="text-xl font-semibold">প্রজেক্টের চূড়ান্ত ফলাফল</h3>
+                            <p class="mt-2">
+                                আমাদের বিস্তারিত রিপোর্ট এবং সুপারিশ অনুসরণ করে, "ShopNest"-এর ডেভেলপার টিম সফলভাবে সকল চিহ্নিত দুর্বলতা সমাধান করেছে। চূড়ান্ত পুনঃপরীক্ষার পর আমরা নিশ্চিত করেছি যে প্ল্যাটফর্মটি এখন আগের চেয়ে অনেক বেশি নিরাপদ এবং সম্ভাব্য সাইবার আক্রমণ থেকে সুরক্ষিত। এই প্রজেক্টটি প্রমাণ করে যে, যেকোনো অ্যাপ্লিকেশন ব্যবহারকারীদের জন্য উন্মুক্ত করার আগে একটি প্রফেশনাল সিকিউরিটি অডিট কতটা জরুরি।
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const vulnerabilityData = [
+                {
+                    id: 'sql',
+                    title: 'SQL ইনজেকশন',
+                    riskLevel: 'অত্যন্ত উচ্চ',
+                    riskClass: 'risk-critical',
+                    riskScore: 3,
+                    description: 'সাইটের সার্চ এবং ফিল্টার কার্যকারিতায় একটি গুরুতর SQL ইনজেকশন দুর্বলতা পাওয়া গিয়েছিল। এর মাধ্যমে একজন হ্যাকার সরাসরি ডাটাবেজে অ্যাক্সেস নিতে পারতো।',
+                    impact: ['সকল ব্যবহারকারীর ব্যক্তিগত তথ্য (নাম, ঠিকানা, ফোন নম্বর, পাসওয়ার্ড) চুরি হওয়া।','ক্রেডিট কার্ডের তথ্যের মতো সংবেদনশীল ডেটা ফাঁস হওয়া।','সম্পূর্ণ ডাটাবেজ মুছে ফেলা বা পরিবর্তন করে দেওয়া।'],
+                    solution: 'ডাটাবেজ কোয়েরির জন্য **প্যারামিটারাইজড কোয়েরি (Parameterized Queries) বা প্রিপেয়ার্ড স্টেটমেন্ট (Prepared Statements)** ব্যবহার করার পরামর্শ দেওয়া হয়েছে। এটি ব্যবহারকারীর ইনপুটকে কোড হিসেবে রান হতে দেয় না।'
+                },
+                {
+                    id: 'xss',
+                    title: 'ক্রস-সাইট স্ক্রিপ্টিং (XSS)',
+                    riskLevel: 'উচ্চ',
+                    riskClass: 'risk-high',
+                    riskScore: 2,
+                    description: 'প্রোডাক্ট রিভিউ সেকশনে একজন ব্যবহারকারী ক্ষতিকারক জাভাস্ক্রিপ্ট কোড পোস্ট করতে পারছিল। যখন অন্য কোনো ব্যবহারকারী সেই প্রোডাক্ট পেজটি ভিজিট করতো, তখন ওই কোডটি তার ব্রাউজারে রান হতো।',
+                    impact: ['অন্যান্য ব্যবহারকারীদের অ্যাকাউন্টের সম্পূর্ণ নিয়ন্ত্রণ নেওয়া (Session Hijacking)।','ব্যবহারকারীদের সংবেদনশীল তথ্য চুরি করা।','ফিশিং অ্যাটাকের মাধ্যমে ব্যবহারকারীদের লগইন তথ্য হাতিয়ে নেওয়া।'],
+                    solution: 'ব্যবহারকারীর দেওয়া যেকোনো ইনপুটকে ওয়েবসাইটে দেখানোর আগে **আউটপুট এনকোডিং (Output Encoding)** এবং একটি শক্তিশালী **কনটেন্ট সিকিউরিটি পলিসি (Content Security Policy - CSP)** প্রয়োগ করার সুপারিশ করা হয়েছে।'
+                },
+                {
+                    id: 'idor',
+                    title: 'অনিরাপদ অর্ডার অ্যাক্সেস (IDOR)',
+                    riskLevel: 'মাঝারি',
+                    riskClass: 'risk-medium',
+                    riskScore: 1,
+                    description: '"My Orders" পেজের URL-এ থাকা অর্ডার আইডি পরিবর্তন করে একজন ব্যবহারকারী অন্য যেকোনো ব্যবহারকারীর অর্ডারের বিস্তারিত তথ্য (যেমন: কী অর্ডার করেছে, কোথায় ডেলিভারি হবে) দেখতে পারছিল।',
+                    impact: ['ব্যবহারকারীদের গোপনীয়তা নষ্ট হওয়া।','ব্যক্তিগত তথ্য ফাঁস হওয়া এবং তার অপব্যবহার।'],
+                    solution: 'সার্ভার-সাইডে একটি শক্তিশালী **অ্যাক্সেস কন্ট্রোল (Access Control)** ব্যবস্থা যুক্ত করার পরামর্শ দেওয়া হয়েছে। এর ফলে, কোনো ডেটা দেখানোর আগে সার্ভার যাচাই করে নেবে যে, যে ব্যবহারকারী অনুরোধ করছে, সেই ডেটা দেখার অনুমতি তার আছে কিনা।'
+                }
+            ];
+
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const vulnerabilityListEl = document.getElementById('vulnerability-list');
+            const vulnerabilityDetailsEl = document.getElementById('vulnerability-details');
+            let activeVulnerabilityId = null;
+            let chart = null;
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tab = button.dataset.tab;
+                    tabButtons.forEach(btn => btn.classList.remove('tab-active'));
+                    button.classList.add('tab-active');
+                    tabContents.forEach(content => content.classList.add('hidden'));
+                    document.getElementById(`${tab}-content`).classList.remove('hidden');
+                    if (tab === 'findings' && !chart) {
+                        renderChart();
+                    }
+                });
+            });
+
+            function renderVulnerabilityList() {
+                vulnerabilityListEl.innerHTML = '';
+                vulnerabilityData.forEach(vuln => {
+                    const card = document.createElement('div');
+                    card.className = `vulnerability-card p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 ${activeVulnerabilityId === vuln.id ? 'vulnerability-card-active' : 'border-transparent hover:border-gray-300'}`;
+                    card.dataset.id = vuln.id;
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-lg text-gray-800">${vuln.title}</h4>
+                            <span class="text-xs font-bold text-white px-2 py-1 rounded-full ${vuln.riskClass}">${vuln.riskLevel}</span>
+                        </div>
+                        <p class="text-sm text-gray-600">${vuln.description.substring(0, 80)}...</p>
+                    `;
+                    card.addEventListener('click', () => selectVulnerability(vuln.id));
+                    vulnerabilityListEl.appendChild(card);
+                });
+            }
+
+            function selectVulnerability(id) {
+                if (activeVulnerabilityId === id) return;
+                activeVulnerabilityId = id;
+                renderVulnerabilityList();
+                renderVulnerabilityDetails();
+            }
+
+            function renderVulnerabilityDetails() {
+                const vuln = vulnerabilityData.find(v => v.id === activeVulnerabilityId);
+                if (!vuln) {
+                    vulnerabilityDetailsEl.innerHTML = `<div class="flex items-center justify-center h-full"><p class="text-gray-500">বিস্তারিত দেখতে বাম পাশ থেকে একটি দুর্বলতা নির্বাচন করুন।</p></div>`;
+                    return;
+                }
+                
+                const impactHtml = vuln.impact.map(item => `<li class="flex items-start gap-3"><span class="flex-shrink-0 text-red-500 mt-1">&#10007;</span><span>${item}</span></li>`).join('');
+                
+                vulnerabilityDetailsEl.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-bold text-gray-900">${vuln.title}</h3>
+                        <span class="text-sm font-bold text-white px-3 py-1 rounded-full ${vuln.riskClass}">${vuln.riskLevel}</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-700 border-b pb-1 mb-2">বিবরণ</h4>
+                            <p class="text-gray-600">${vuln.description}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700 border-b pb-1 mb-2">সম্ভাব্য প্রভাব</h4>
+                            <ul class="space-y-2 text-gray-600">${impactHtml}</ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700 border-b pb-1 mb-2">আমাদের সুপারিশ</h4>
+                            <div class="bg-green-50 text-gray-800 p-3 rounded-md border border-green-200">
+                                ${vuln.solution.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}
+                            </div>
+                        </div>
+                        <div class="border-t pt-4 mt-4">
+                            <h4 class="font-semibold text-gray-700 mb-3">✨ Gemini AI এসিস্ট্যান্ট</h4>
+                            <div class="flex flex-wrap gap-3">
+                                <button data-action="explain" class="gemini-btn font-semibold py-2 px-4 rounded-full flex items-center gap-2 text-sm">সহজ ভাষায় ব্যাখ্যা করুন</button>
+                                <button data-action="checklist" class="gemini-btn font-semibold py-2 px-4 rounded-full flex items-center gap-2 text-sm">প্রতিরোধ চেকলিস্ট তৈরি করুন</button>
+                            </div>
+                            <div id="ai-loader" class="mt-4 hidden"><div class="loader"></div></div>
+                            <div id="ai-generated-content" class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200 text-gray-800 hidden"></div>
+                        </div>
+                    </div>
+                `;
+
+                vulnerabilityDetailsEl.querySelector('button[data-action="explain"]').addEventListener('click', handleAIAssist);
+                vulnerabilityDetailsEl.querySelector('button[data-action="checklist"]').addEventListener('click', handleAIAssist);
+            }
+
+            async function handleAIAssist(event) {
+                const action = event.currentTarget.dataset.action;
+                const vuln = vulnerabilityData.find(v => v.id === activeVulnerabilityId);
+                if (!vuln) return;
+
+                let prompt = '';
+                if (action === 'explain') {
+                    prompt = `You are a cybersecurity expert explaining things to a non-technical manager. Explain the following technical solution for a '${vuln.title}' vulnerability in simple, easy-to-understand Bangla, focusing on the 'why' and the business benefit. Technical solution: ${vuln.solution}`;
+                } else if (action === 'checklist') {
+                    prompt = `You are a senior developer creating a guide for your team. Based on the '${vuln.title}' vulnerability and its solution '${vuln.solution}', create a practical, actionable developer checklist in Bangla markdown format to prevent this issue in future projects.`;
+                }
+
+                await getAIGeneratedContent(prompt, action);
+            }
+
+            async function getAIGeneratedContent(prompt) {
+                const loader = document.getElementById('ai-loader');
+                const contentBox = document.getElementById('ai-generated-content');
+                
+                loader.classList.remove('hidden');
+                contentBox.classList.add('hidden');
+                contentBox.innerHTML = '';
+                
+                try {
+                    let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                    const payload = { contents: chatHistory };
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API request failed with status ${response.status}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0) {
+                        let text = result.candidates[0].content.parts[0].text;
+                        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        text = text.replace(/\* (.*?)(?=\n\*|\n$)/g, '<li class="mb-1">$1</li>');
+                        text = text.replace(/<\/li>(\s*<li)/g, '</li><li');
+                        contentBox.innerHTML = `<ul>${text}</ul>`;
+                    } else {
+                         contentBox.textContent = 'দুঃখিত, কোনো উত্তর পাওয়া যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।';
+                    }
+                } catch (error) {
+                    console.error('Gemini API Error:', error);
+                    contentBox.textContent = 'একটি ত্রুটি ঘটেছে। অনুগ্রহ করে আপনার নেটওয়ার্ক সংযোগ পরীক্ষা করুন এবং আবার চেষ্টা করুন।';
+                } finally {
+                    loader.classList.add('hidden');
+                    contentBox.classList.remove('hidden');
+                }
+            }
+
+
+            function renderChart() {
+                const ctx = document.getElementById('findingsChart').getContext('2d');
+                const labels = vulnerabilityData.map(v => v.title);
+                const data = vulnerabilityData.map(v => v.riskScore);
+                const backgroundColors = vulnerabilityData.map(v => {
+                    if(v.riskLevel === 'অত্যন্ত উচ্চ') return 'rgba(220, 53, 69, 0.7)';
+                    if(v.riskLevel === 'উচ্চ') return 'rgba(253, 126, 20, 0.7)';
+                    return 'rgba(255, 193, 7, 0.7)';
+                });
+                 const borderColors = vulnerabilityData.map(v => {
+                    if(v.riskLevel === 'অত্যন্ত উচ্চ') return 'rgba(220, 53, 69, 1)';
+                    if(v.riskLevel === 'উচ্চ') return 'rgba(253, 126, 20, 1)';
+                    return 'rgba(255, 193, 7, 1)';
+                });
+
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'ঝুঁকির মাত্রা',
+                            data: data,
+                            backgroundColor: backgroundColors,
+                            borderColor: borderColors,
+                            borderWidth: 1,
+                            borderRadius: 4,
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        const levels = {0: '', 1: 'মাঝারি', 2: 'উচ্চ', 3: 'অত্যন্ত উচ্চ'};
+                                        return levels[value] || '';
+                                    },
+                                    font: { size: 12 }
+                                },
+                                grid: { display: false }
+                            },
+                            y: {
+                                grid: { display: false },
+                                ticks: { font: { size: 14 } }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const riskLevels = ['মাঝারি', 'উচ্চ', 'অত্যন্ত উচ্চ'];
+                                        return `ঝুঁকি: ${riskLevels[context.raw - 1]}`;
+                                    }
+                                }
+                            }
+                        },
+                        onClick: (event, elements) => {
+                            if (elements.length > 0) {
+                                const index = elements[0].index;
+                                const vulnId = vulnerabilityData[index].id;
+                                selectVulnerability(vulnId);
+                            }
+                        }
+                    }
+                });
+            }
+
+            renderVulnerabilityList();
+            selectVulnerability('sql');
+        });
+    </script>
+</body>
+</html>
