@@ -3,1451 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="logo.png">
     <title>SR Security - Cyber Security Platform</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
-        /* Base Styles */
-        /* Add to CSS */
-        :root {
-        --bg-color: #0a0a1a;
-        --text-color: #ffffff;
-        --accent-1: #00ff88;
-        --accent-2: #00a3ff;
-        --card-bg: rgba(255, 255, 255, 0.05);
-        }
-
-        [data-theme="light"] {
-        --bg-color: #f8f9fa;
-        --text-color: #0a0a1a;
-        --card-bg: rgba(0, 0, 0, 0.05);
-        }
-
-        body {
-        background: var(--bg-color);
-        color: var(--text-color);
-        transition: background 0.5s ease;
-        }
-
-/* Update all color references to use variables */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            background: #0a0a1a;
-            color: #ffffff;
-            overflow-x: hidden;
-        }
-
-        /* Navbar Styles */
-        .navbar {
-            padding: 1.5rem 5%;
-            background: rgba(10, 10, 26, 0.95);
-            backdrop-filter: blur(10px);
-            position: fixed;
-            width: 100%;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, #00ff88, #00a3ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: 500;
-            transition: 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: #00ff88;
-        }
-
-        /* Hero Section */
-        .hero {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            padding: 0 5%;
-            background: radial-gradient(circle at 75% 30%, #001233, #0a0a1a);
-        }
-
-        .hero-content {
-            max-width: 600px;
-        }
-
-        .hero h1 {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, #00ff88, #00a3ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: fadeInUp 1s ease;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-
-        .cyber-radar-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: #0a0e1700;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        .radar-wrapper {
-            position: relative;
-            width: 400px;
-            height: 400px;
-        }
-
-        .radar {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: 
-                radial-gradient(circle at 50% 50%,
-                    rgba(0, 82, 102, 0.1) 0%,
-                    rgba(0, 40, 51, 0.2) 30%,
-                    rgba(0, 20, 26, 0.4) 70%,
-                    rgba(0, 10, 13, 0.8) 100%);
-            overflow: hidden;
-        }
-
-        .radar:before {
-            content: '';
-            position: absolute;
-            width: 50%;
-            height: 50%;
-            border: 2px solid #00f7ff;
-            border-radius: 50%;
-            top: 25%;
-            left: 25%;
-            opacity: 0.3;
-        }
-
-        .radar:after {
-            content: '';
-            position: absolute;
-            width: 75%;
-            height: 75%;
-            border: 2px solid #00f7ff;
-            border-radius: 50%;
-            top: 12.5%;
-            left: 12.5%;
-            opacity: 0.2;
-        }
-
-        .radar-scan {
-            position: absolute;
-            width: 50%;
-            height: 50%;
-            background: linear-gradient(45deg,
-                rgba(0, 247, 255, 0) 0%,
-                rgba(0, 247, 255, 0.4) 50%,
-                rgba(0, 247, 255, 0) 100%);
-            top: 25%;
-            left: 25%;
-            border-radius: 50%;
-            animation: radar-scan 3s linear infinite;
-            transform-origin: 100% 100%;
-        }
-
-        .radar-center {
-            position: absolute;
-            width: 15px;
-            height: 15px;
-            background: #00f7ff;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 20px #00f7ff;
-        }
-
-        .radar-gradient {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% 50%,
-                rgba(0, 247, 255, 0.1) 0%,
-                rgba(0, 247, 255, 0.05) 30%,
-                rgba(0, 247, 255, 0.01) 70%,
-                transparent 100%);
-        }
-
-        .radar-glow {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% 50%,
-                rgba(0, 247, 255, 0.2) 0%,
-                transparent 60%);
-            animation: radar-glow 2s ease-in-out infinite;
-        }
-
-        .threat-marker {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #ff1a4d;
-            border-radius: 50%;
-            animation: threat-pulse 1.5s infinite;
-            filter: drop-shadow(0 0 8px #ff1a4d);
-        }
-
-        .threat-1 { top: 30%; left: 35%; }
-        .threat-2 { top: 55%; left: 65%; }
-        .threat-3 { top: 70%; left: 45%; }
-
-        .radar-status {
-            position: absolute;
-            bottom: -40px;
-            width: 100%;
-            text-align: center;
-            color: #00f7ff;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 0.9em;
-        }
-
-        .scan-text {
-            display: inline-block;
-            animation: text-flicker 1.5s infinite;
-        }
-
-        .threat-count {
-            margin-top: 10px;
-            font-weight: bold;
-            color: #ff1a4d;
-            text-shadow: 0 0 10px #ff1a4d;
-        }
-
-        @keyframes radar-scan {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes radar-glow {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 0.8; }
-        }
-
-        @keyframes threat-pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes text-flicker {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 0.3; }
-        }
-
-
-        /* Animated Button */
-        .cta-btn {
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            background: linear-gradient(45deg, #00ff88, #00a3ff);
-            border: none;
-            border-radius: 50px;
-            color: #0a0a1a;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-        }
-
-        .cta-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                120deg,
-                transparent,
-                rgba(255, 255, 255, 0.3),
-                transparent
-            );
-            transition: 0.5s;
-        }
-
-        .cta-btn:hover::before {
-            left: 100%;
-        }
-
-        /* Features Section */
-        .features {
-            padding: 5rem 5%;
-            background: #0a0a1a;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2rem;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Resources Section */
-        .resources {
-            padding: 5rem 5%;
-        }
-
-        .resources-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .resource-card {
-            background: rgba(0, 162, 255, 0.1);
-            padding: 1.5rem;
-            border-radius: 10px;
-            text-align: center;
-            transition: 0.3s;
-        }
-
-        .resource-card i {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: #00ff88;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-        }
-
-        .security-checker {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            padding: 2rem;
-            max-width: 500px;
-            margin: 2rem auto;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        .checker-header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .checker-header i {
-            font-size: 2.5rem;
-            color: #4CAF50;
-            margin-bottom: 1rem;
-        }
-
-        .checker-header h3 {
-            color: #2d3436;
-            margin: 0;
-            font-size: 1.4rem;
-        }
-
-        .input-container {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-
-        #passwordInput {
-            width: 100%;
-            padding: 12px 45px 12px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        #passwordInput:focus {
-            outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);
-        }
-
-        .visibility-toggle {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #757575;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        .strength-meter {
-            height: 8px;
-            background: #f0f0f0;
-            border-radius: 4px;
-            margin: 1.5rem 0;
-            overflow: hidden;
-        }
-
-        .strength-bar {
-            height: 100%;
-            width: 0;
-            background: #e53935;
-            border-radius: 4px;
-            transition: all 0.4s ease;
-        }
-
-        .strength-feedback {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-        }
-
-        .strength-text {
-            color: #616161;
-        }
-
-        .strength-status {
-            color: #e53935;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .requirements-list {
-            margin: 1.5rem 0;
-        }
-
-        .requirement {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #757575;
-            margin: 8px 0;
-            font-size: 0.9rem;
-        }
-
-        .requirement i {
-            font-size: 0.8rem;
-        }
-
-        .requirement.valid {
-            color: #4CAF50;
-        }
-
-        .requirement.valid i {
-            color: #4CAF50;
-        }
-
-        .checker-footer {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #757575;
-            font-size: 0.85rem;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #eee;
-        }
-
-        .checker-footer i {
-            color: #4CAF50;
-        }
-
-        /* Strength Colors */
-        [data-strength="1"] { background: #e53935; width: 25%; }
-        [data-strength="2"] { background: #fb8c00; width: 50%; }
-        [data-strength="3"] { background: #fdd835; width: 75%; }
-        [data-strength="4"] { background: #4CAF50; width: 100%; }
-
-        /* Add these styles */
-        .testimonial-card {
-        background: var(--card-bg);
-        padding: 1.5rem;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .modal {
-        display: none;
-        position: fixed;
-        z-index: 1001;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        }
-
-        .modal-content {
-        background: var(--bg-color);
-        margin: 15% auto;
-        padding: 2rem;
-        width: 300px;
-        border-radius: 10px;
-        }
-
-        .strength-meter {
-        width: 100%;
-        height: 5px;
-        background: #444;
-        margin-top: 1rem;
-        }
-
-        .strength-bar {
-        height: 100%;
-        transition: width 0.3s ease;
-        }
-
-        .premium-section {
-            position: relative;
-            padding: 80px 20px;
-            background: radial-gradient(circle at center, #0a0e17 0%, #020204 100%);
-        }
-
-        .premium-lock-container {
-            max-width: 800px;
-            margin: 0 auto;
-            perspective: 1000px;
-        }
-
-        .premium-lock {
-            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            border: 1px solid rgba(76, 175, 80, 0.1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            transform-style: preserve-3d;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .lock-icon-container {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 30px;
-        }
-
-        .fa-lock {
-            font-size: 3.5rem;
-            color: #4CAF50;
-            position: relative;
-            z-index: 2;
-            animation: lockFloat 3s ease-in-out infinite;
-        }
-
-        .lock-glow {
-            position: absolute;
-            width: 150%;
-            height: 150%;
-            background: radial-gradient(circle, rgba(76,175,80,0.2) 0%, transparent 60%);
-            top: -25%;
-            left: -25%;
-            animation: glowPulse 2s infinite;
-        }
-
-        .premium-title {
-            color: #fff;
-            font-size: 2.2rem;
-            margin-bottom: 15px;
-            font-weight: 600;
-            text-shadow: 0 2px 10px rgba(76,175,80,0.3);
-        }
-
-        .premium-subtitle {
-            color: #a0a0a0;
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto 30px;
-            line-height: 1.6;
-        }
-
-        .premium-unlock-btn {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-            border: none;
-            padding: 18px 45px;
-            color: white;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 15px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .premium-unlock-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 25px rgba(76,175,80,0.4);
-        }
-
-        .premium-unlock-btn i {
-            transition: transform 0.3s ease;
-        }
-
-        .premium-unlock-btn:hover i {
-            transform: translateX(5px);
-        }
-
-        /* Modal Styles */
-        .premium-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
-        }
-
-        .modal-overlay {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-container {
-            position: relative;
-            background: linear-gradient(145deg, #121212, #0a0a0a);
-            max-width: 500px;
-            margin: 100px auto;
-            border-radius: 15px;
-            border: 1px solid rgba(76,175,80,0.1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-
-        .modal-header {
-            padding: 25px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h3 {
-            color: #fff;
-            font-size: 1.5rem;
-            margin: 0;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .modal-close:hover {
-            color: #4CAF50;
-        }
-
-        .modal-body {
-            padding: 30px;
-        }
-
-        .auth-input-group {
-            position: relative;
-            margin-bottom: 25px;
-        }
-
-        .auth-input-group input {
-            width: 100%;
-            padding: 15px 20px 15px 50px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(76,175,80,0.2);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .auth-input-group input:focus {
-            border-color: #4CAF50;
-            box-shadow: 0 0 15px rgba(76,175,80,0.2);
-        }
-
-        .auth-input-group label {
-            position: absolute;
-            left: 50px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
-
-        .auth-input-group input:focus ~ label,
-        .auth-input-group input:valid ~ label {
-            top: -10px;
-            left: 35px;
-            font-size: 0.8rem;
-            color: #4CAF50;
-        }
-
-        .auth-input-group i {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #4CAF50;
-        }
-
-        .auth-submit-btn {
-            background: #4CAF50;
-            border: none;
-            width: 100%;
-            padding: 16px;
-            color: white;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .auth-submit-btn:hover {
-            background: #45a049;
-            transform: translateY(-2px);
-        }
-
-        .modal-footer {
-            padding: 20px;
-            background: rgba(0,0,0,0.3);
-            text-align: center;
-            color: #4CAF50;
-            font-size: 0.9rem;
-        }
-
-        @keyframes lockFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        @keyframes glowPulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.6; }
-        }
-
-        @media (max-width: 768px) {
-            .premium-lock {
-                padding: 30px 20px;
-            }
-            
-            .premium-title {
-                font-size: 1.8rem;
-            }
-        }
-
-
-        .testimonials {
-            padding: 80px 20px;
-            background: #0a0a1a;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .testimonials-header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .testimonials h2 {
-            font-size: 2.5rem;
-            color: #6bcfeb;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .section-subtitle {
-            color: #4CAF50;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-size: 0.9rem;
-        }
-
-        .testimonial-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .testimonial-card {
-            background: #6767d1;
-            border-radius: 15px;
-            padding: 30px;
-            position: relative;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid rgba(76, 175, 80, 0.1);
-        }
-
-        .testimonial-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-        }
-
-        .quote-icon {
-            position: absolute;
-            top: -20px;
-            left: -20px;
-            opacity: 0.1;
-            z-index: 1;
-        }
-
-        .client-header {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .client-img {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: 3px solid #4CAF50;
-            padding: 3px;
-            object-fit: cover;
-        }
-
-        .client-info h4 {
-            margin: 0;
-            color: #2d3436;
-            font-size: 1.2rem;
-        }
-
-        .client-role {
-            color: #636e72;
-            font-size: 0.9rem;
-            margin: 5px 0;
-        }
-
-        .client-logo img {
-            height: 25px;
-            opacity: 0.8;
-        }
-
-        .testimonial-text {
-            color: #2d3436;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin: 0 0 20px 0;
-            position: relative;
-            padding-left: 25px;
-        }
-
-        .testimonial-text::before {
-            content: "“";
-            position: absolute;
-            left: -25px;
-            top: -15px;
-            font-size: 4rem;
-            color: #4CAF50;
-            opacity: 0.3;
-            font-family: Arial;
-        }
-
-        .testimonial-footer {
-            border-top: 1px solid rgba(76, 175, 80, 0.1);
-            padding-top: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .rating {
-            color: #ffd700;
-            font-size: 1.1rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .testimonials {
-                padding: 50px 15px;
-            }
-            
-            .testimonials h2 {
-                font-size: 2rem;
-            }
-            
-            .testimonial-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .client-header {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .client-img {
-                width: 100px;
-                height: 100px;
-            }
-        }
-
-        .company-footer {
-            background-color: #2d2d2d;
-            color: #ffffff;
-            padding: 40px 0 20px;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .footer-section {
-            margin-bottom: 25px;
-        }
-
-        .footer-heading {
-            color: #ffffff;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .footer-text {
-            margin: 10px 0;
-            line-height: 1.6;
-            display: flex;
-            align-items: center;
-        }
-
-        .footer-icon {
-            color: #4CAF50;
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .footer-link {
-            color: #ffffff;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer-link:hover {
-            color: #4CAF50;
-        }
-
-        .social-container {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .social-link {
-            color: #ffffff;
-            background-color: #4CAF50;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .social-link:hover {
-            background-color: #45a049;
-            transform: translateY(-2px);
-        }
-
-        .social-icon {
-            font-size: 1.2rem;
-        }
-
-        .copyright-section {
-            border-top: 1px solid #444444;
-            padding-top: 20px;
-            text-align: center;
-        }
-
-        .copyright-text {
-            color: #cccccc;
-            font-size: 0.9rem;
-            margin: 0;
-        }
-
-        @media (max-width: 768px) {
-            .footer-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .footer-section {
-                text-align: center;
-            }
-            
-            .footer-text {
-                justify-content: center;
-            }
-            
-            .social-container {
-                justify-content: center;
-            }
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="logo">SR Security</div>
         <div class="nav-links">
-            <a href="#home">Home</a>
-            <a href="#features">Services</a>
-            <a href="#resources">Resources</a>
-            <a href="#contact">Contact</a>
+            <a href="index.html">Home</a>
+            <a href="services.html">Services</a>
+            <a href="resources.html">Resources</a>
+            <a href="contact.html">Contact</a>
         </div>
-        <!-- In navbar section -->
-        <button id="themeToggle" class="cta-btn">
-        <i class="fas fa-moon"></i>
-        </button>
+        <div class="nav-actions">
+            <button id="themeToggle" class="theme-toggle-btn">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-content">
             <h1>Secure Your Digital Future</h1>
-            <p>Advanced cyber security solutions for enterprises and individuals</p>
+            <p>Advanced cyber security solutions for enterprises and individuals.</p>
             <button class="cta-btn">Get Protected Now</button>
         </div>
-
         <div class="cyber-radar-container">
-        <div class="radar-wrapper">
-            <div class="radar">
-                <div class="radar-gradient"></div>
-                <div class="radar-scan"></div>
-                <div class="radar-center"></div>
-                <div class="radar-glow"></div>
-                <div class="threat-marker threat-1"></div>
-                <div class="threat-marker threat-2"></div>
-                <div class="threat-marker threat-3"></div>
-            </div>
-            <div class="radar-status">
-                <span class="scan-text">SCANNING NETWORK</span>
-                <div class="threat-count">THREATS DETECTED: 03</div>
+            <div class="radar-wrapper">
+                <div class="radar">
+                    <div class="radar-gradient"></div>
+                    <div class="radar-scan"></div>
+                    <div class="radar-center"></div>
+                    <div class="radar-glow"></div>
+                    <div class="threat-marker threat-1"></div>
+                    <div class="threat-marker threat-2"></div>
+                    <div class="threat-marker threat-3"></div>
+                </div>
+                <div class="radar-status">
+                    <span class="scan-text">SCANNING NETWORK</span>
+                    <div class="threat-count">THREATS DETECTED: 03</div>
+                </div>
             </div>
         </div>
-    </div>
-        
     </section>
 
-    <!-- Features Section -->
     <section class="features" id="features">
-        <h2>Our Services</h2>
+        <div class="section-header">
+            <h2 class="section-title">Our Core Services</h2>
+            <p class="section-subtitle">Comprehensive protection for your digital assets.</p>
+        </div>
         <div class="features-grid">
             <div class="feature-card">
+                <div class="card-icon"><i class="fas fa-shield-virus"></i></div>
                 <h3>Threat Detection</h3>
-                <p>24/7 monitoring and advanced threat detection systems</p>
+                <p>24/7 monitoring and advanced threat detection systems.</p>
             </div>
             <div class="feature-card">
+                <div class="card-icon"><i class="fas fa-file-contract"></i></div>
                 <h3>Data Encryption</h3>
-                <p>Military-grade encryption for your sensitive data</p>
+                <p>Military-grade encryption for your sensitive data.</p>
             </div>
             <div class="feature-card">
+                <div class="card-icon"><i class="fas fa-user-secret"></i></div>
                 <h3>Vulnerability Assessment</h3>
-                <p>Comprehensive security audits and penetration testing</p>
+                <p>Comprehensive security audits and penetration testing.</p>
             </div>
         </div>
     </section>
 
-    <!-- Resources Section -->
     <section class="resources" id="resources">
-        <h2>Free Resources</h2>
-        <div class="resources-grid">
-            <div class="resource-card">
-                <i class="fas fa-shield-alt"></i>
-                <h3>Security Checklist</h3>
-                <p>Essential security practices for small businesses</p>
-                <button class="cta-btn">Download</button>
-            </div>
-            <div class="resource-card">
-                <i class="fas fa-lock"></i>
-                <h3>Password Guide</h3>
-                <p>Create strong, hack-proof passwords</p>
-                <button class="cta-btn">Download</button>
-            </div>
-            <div class="resource-card">
-                <i class="fas fa-book"></i>
-                <h3>Security Handbook</h3>
-                <p>Complete guide to cyber security basics</p>
-                <button class="cta-btn">Download</button>
-            </div>
+        <div class="section-header">
+            <h2 class="section-title">Free Security Tools</h2>
+            <p class="section-subtitle">Empower yourself with our free resources.</p>
+        </div>
+        <div class="resources-container">
             <div class="security-checker">
-            <div class="checker-header">
-                <i class="fas fa-shield-alt"></i>
-                <h3>Password Security Analyzer</h3>
-            </div>
-            
-            <div class="checker-body">
-                <div class="input-container">
-                    <input type="password" id="passwordInput" placeholder="Enter password to analyze" autocomplete="off">
-                    <button class="visibility-toggle" onclick="toggleVisibility()">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-                
-                <div class="strength-meter">
-                    <div class="strength-bar" data-strength="0"></div>
-                </div>
-                
-                <div class="strength-feedback">
-                    <span class="strength-text">Password Strength: </span>
-                    <span class="strength-status">Very Weak</span>
-                </div>
-                
-                <div class="requirements-list">
-                    <p class="requirement"><i class="fas fa-times"></i> Minimum 12 characters</p>
-                    <p class="requirement"><i class="fas fa-times"></i> Uppercase letters</p>
-                    <p class="requirement"><i class="fas fa-times"></i> Numbers</p>
-                    <p class="requirement"><i class="fas fa-times"></i> Special characters</p>
-                </div>
-            </div>
-            
-            <div class="checker-footer">
-                <i class="fas fa-info-circle"></i>
-                <span>Always use strong, unique passwords</span>
-            </div>
-        </div>
-        </div>
-    </section>
-
-    <section class="premium-section" id="premium">
-        <div class="premium-lock-container">
-            <div class="premium-lock">
-                <div class="lock-icon-container">
-                    <i class="fas fa-lock"></i>
-                    <div class="lock-glow"></div>
-                </div>
-                <h3 class="premium-title">Exclusive Security Resources</h3>
-                <p class="premium-subtitle">Unlock cutting-edge cybersecurity tools and advanced threat intelligence</p>
-                <button class="premium-unlock-btn" onclick="showAuthModal()">
-                    <span class="btn-text">Access Restricted Content</span>
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Auth Modal -->
-        <div id="authModal" class="premium-modal">
-            <div class="modal-overlay" onclick="closeModal()"></div>
-            <div class="modal-container">
-                <div class="modal-header">
-                    <h3>Secure Authentication</h3>
-                    <button class="modal-close" onclick="closeModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="auth-input-group">
-                        <input type="password" id="premiumPass" required>
-                        <label>Enterprise Access Code</label>
-                        <i class="fas fa-key"></i>
-                    </div>
-                    <button class="auth-submit-btn" onclick="checkPremiumAccess()">
-                        Verify Identity
-                        <div class="btn-loader"></div>
-                    </button>
-                </div>
-                <div class="modal-footer">
+                <div class="checker-header">
                     <i class="fas fa-shield-alt"></i>
-                    <span>256-bit AES Encryption</span>
+                    <h3>Password Security Analyzer</h3>
+                </div>
+                <div class="checker-body">
+                    <div class="input-container">
+                        <input type="password" id="passwordInput" placeholder="Enter password to analyze" autocomplete="off">
+                        <button class="visibility-toggle" id="visibilityToggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="strength-meter">
+                        <div class="strength-bar" data-strength="0"></div>
+                    </div>
+                    <div class="strength-feedback">
+                        <span class="strength-text">Password Strength:</span>
+                        <span class="strength-status">Too Weak</span>
+                    </div>
+                    <div class="requirements-list">
+                        <p class="requirement" id="req-length"><i class="fas fa-times-circle"></i> Minimum 12 characters</p>
+                        <p class="requirement" id="req-upper"><i class="fas fa-times-circle"></i> Uppercase letters</p>
+                        <p class="requirement" id="req-number"><i class="fas fa-times-circle"></i> Numbers</p>
+                        <p class="requirement" id="req-special"><i class="fas fa-times-circle"></i> Special characters</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Add new section -->
     <section class="testimonials" id="testimonials">
-        <div class="testimonials-header">
-            <h2>Client Trust</h2>
-            <p class="section-subtitle">What Our Clients Say</p>
+        <div class="section-header">
+            <h2 class="section-title">What Our Clients Say</h2>
+            <p class="section-subtitle">Building trust through proven results.</p>
         </div>
-        
         <div class="testimonial-grid">
-            <!-- Testimonial Card 1 -->
             <div class="testimonial-card">
-                <div class="quote-icon">
-                    <svg viewBox="0 0 24 24" width="28" fill="#4CAF50">
-                        <path d="M10 7L8 11H11V17H5V11L7 7H10M18 7L16 11H19V17H13V11L15 7H18Z"/>
-                    </svg>
-                </div>
                 <div class="client-header">
-                    <img src="https://i.ibb.co/gMmKBjqj/christian-buehner-DIt-Ylc26z-VI-unsplash.jpg" alt="John Smith" class="client-img">
+                    <img src="https://i.ibb.co/gMmKBjqj/christian-buehner-DIt-Ylc26z-VI-unsplash.jpg" alt="Client" class="client-img">
                     <div class="client-info">
                         <h4>John Smith</h4>
                         <p class="client-role">CTO, Tech Corp</p>
-                        <div class="client-logo">
-                            <img src="https://i.ibb.co/4HXgCCx/marcel-strauss-k-Ozjv-V0-Wy8-E-unsplash.jpg" alt="Company Logo">
-                        </div>
                     </div>
                 </div>
                 <blockquote class="testimonial-text">
-                    "SR Security transformed our network protection strategy completely. Their proactive approach prevented major breaches during our digital transition."
+                    SR Security transformed our protection strategy. Their proactive approach prevented major breaches.
                 </blockquote>
                 <div class="testimonial-footer">
                     <div class="rating">
-                        ★★★★★
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                     </div>
                 </div>
             </div>
-
-            <!-- Repeat more cards as needed -->
-        </div>
+            </div>
     </section>
-
-    <footer class="company-footer">
+    
+    <footer class="company-footer" id="contact">
         <div class="footer-container">
             <div class="footer-grid">
-                <!-- Contact Information -->
                 <div class="footer-section">
                     <h4 class="footer-heading">SR Security HQ</h4>
-                    <div class="contact-info">
-                        <p class="footer-text">
-                            <i class="fas fa-map-marker-alt footer-icon"></i>
-                            012-New Market, Bogura Sadar
-                        </p>
-                        <p class="footer-text">
-                            <i class="fas fa-phone footer-icon"></i>
-                            <a href="tel:+8801932976009" class="footer-link">+880 1932 976009</a>
-                        </p>
-                    </div>
+                    <p class="footer-text"><i class="fas fa-map-marker-alt footer-icon"></i> 012-New Market, Bogura Sadar</p>
+                    <p class="footer-text"><i class="fas fa-phone footer-icon"></i> <a href="tel:+8801932976009" class="footer-link">+880 1932 976009</a></p>
                 </div>
-
-                <!-- Social Links -->
                 <div class="footer-section">
                     <h4 class="footer-heading">Connect With Us</h4>
                     <div class="social-container">
-                        <a href="https://www.facebook.com/unavailable.1111111111" class="social-link" target="_blank">
-                            <i class="fab fa-facebook-f social-icon"></i>
-                        </a>
-                        <a href="https://www.instagram.com/rashedmahmud007" class="social-link" target="_blank">
-                            <i class="fab fa-instagram social-icon"></i>
-                        </a>
-                        <a href="https://www.github.com/rashed76656" class="social-link" target="_blank">
-                            <i class="fab fa-github social-icon"></i>
-                        </a>
+                        <a href="https://www.facebook.com/unavailable.1111111111" class="social-link" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/rashedmahmud007" class="social-link" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.github.com/rashed76656" class="social-link" target="_blank"><i class="fab fa-github"></i></a>
                     </div>
                 </div>
             </div>
-            
-            <!-- Copyright Notice -->
             <div class="copyright-section">
                 <p class="copyright-text">
-                    © 2023 SR Security. All rights reserved.
+                    &copy; <span id="copyright-year"></span> SR Security. All rights reserved.
                 </p>
             </div>
         </div>
     </footer>
 
-    <script>
-        // Add to existing script
-        const themeToggle = document.getElementById('themeToggle');
-        themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('light-theme');
-        const isLight = document.body.classList.contains('light-theme');
-        themeToggle.innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        localStorage.setItem('theme', isLight ? 'light' : 'dark');
-        });
-
-        // Initialize theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        document.body.classList.toggle('light-theme', savedTheme === 'light');
-        themeToggle.innerHTML = savedTheme === 'light' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        // Smooth Scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-        // Navbar Scroll Effect
-        window.addEventListener('scroll', () => {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.style.background = 'rgba(10, 10, 26, 0.95)';
-                navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
-            } else {
-                navbar.style.background = 'rgba(10, 10, 26, 0.95)';
-                navbar.style.boxShadow = 'none';
-            }
-        });
-
-        // Card Animation on Scroll
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = 1;
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        });
-
-        document.querySelectorAll('.feature-card, .resource-card').forEach((el) => {
-            el.style.opacity = 0;
-            el.style.transform = 'translateY(20px)';
-            observer.observe(el);
-        });
-
-        const passwordInput = document.getElementById('passwordInput');
-        const strengthBar = document.querySelector('.strength-bar');
-        const strengthStatus = document.querySelector('.strength-status');
-        const requirements = document.querySelectorAll('.requirement');
-
-        function toggleVisibility() {
-            const type = passwordInput.getAttribute('type');
-            passwordInput.setAttribute('type', type === 'password' ? 'text' : 'password');
-        }
-
-        function checkPasswordStrength(password) {
-            let strength = 0;
-            
-            // Length check
-            if (password.length >= 12) {
-                strength++;
-                requirements[0].classList.add('valid');
-            } else {
-                requirements[0].classList.remove('valid');
-            }
-            
-            // Uppercase check
-            if (/[A-Z]/.test(password)) {
-                strength++;
-                requirements[1].classList.add('valid');
-            } else {
-                requirements[1].classList.remove('valid');
-            }
-            
-            // Number check
-            if (/\d/.test(password)) {
-                strength++;
-                requirements[2].classList.add('valid');
-            } else {
-                requirements[2].classList.remove('valid');
-            }
-            
-            // Special character check
-            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-                strength++;
-                requirements[3].classList.add('valid');
-            } else {
-                requirements[3].classList.remove('valid');
-            }
-            
-            // Update strength bar
-            strengthBar.setAttribute('data-strength', strength);
-            
-            // Update status text
-            const statusText = ['Very Weak', 'Weak', 'Medium', 'Strong', 'Very Strong'];
-            strengthStatus.textContent = statusText[strength];
-            strengthStatus.style.color = strengthBar.style.backgroundColor;
-        }
-
-        passwordInput.addEventListener('input', (e) => {
-            checkPasswordStrength(e.target.value);
-        });
-
-        function showAuthModal() {
-            document.getElementById('authModal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('authModal').style.display = 'none';
-        }
-
-        function checkPremiumAccess() {
-            // Add your authentication logic here
-            const passInput = document.getElementById('premiumPass');
-            if(passInput.value === "") {
-                passInput.parentElement.classList.add('error');
-            }
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
