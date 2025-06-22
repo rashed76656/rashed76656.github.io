@@ -775,3 +775,107 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+.projects {
+    padding: 6rem 5%;
+    background-color: var(--footer-bg); /* A slightly different background to stand out */
+}
+
+/* For light mode */
+[data-theme="light"] .projects {
+    background-color: #e9ecef;
+}
+
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.project-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.project-image-container {
+    height: 220px;
+    overflow: hidden;
+}
+
+.project-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.project-card:hover .project-image {
+    transform: scale(1.05);
+}
+
+.project-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Allows the button to stick to the bottom */
+}
+
+.project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.project-tags span {
+    background-color: rgba(0, 255, 136, 0.1);
+    color: var(--primary-accent);
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.project-title {
+    font-size: 1.5rem;
+    color: var(--heading-color);
+    margin-bottom: 0.75rem;
+}
+
+.project-description {
+    color: var(--text-color);
+    flex-grow: 1; /* Pushes the button down */
+    margin-bottom: 1.5rem;
+}
+
+/* Reusing the button style from Resources page */
+.project-content .cta-btn-outline {
+    display: inline-block;
+    align-self: flex-start; /* Aligns button to the left */
+}
+
+.logo-text { /* অথবা আপনার ন্যাভবরের লোগোর ক্লাস */
+    font-family: "Orbitron", sans-serif; /* <-- এই লাইনটি ফন্ট পরিবর্তন করবে */
+    font-size: 1.8rem;
+    font-weight: 700; /* ফন্টের বোল্ডনেস */
+    font-style: italic; /* লেখাকে ইটালিক করার জন্য */
+    text-decoration: none;
+    
+    /* গ্রেডিয়েন্ট রঙের জন্য কোড */
+    background: linear-gradient(45deg, var(--primary-accent), var(--secondary-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
